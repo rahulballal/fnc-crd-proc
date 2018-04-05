@@ -1,17 +1,59 @@
-class Result {
-  constructor (value = {}) {
-    this.value = value;
-  }
+const noop = function () {
+    return this;
+};
 
-  getValue () {
-    return this.value;
-  }
+// A sum type for error handling
+class Validation {
 }
 
-class Success extends Result { constructor (value) { super(); } }
-class Fail extends Result { constructor (value) { super(); } }
+class Success extends Validation {
+    constructor(value) {
+        super();
+        this.value = value;
+    }
+}
 
-const isSuccess = (object = {}) => (object instanceof Success);
-const isFail = (object = {}) => (object instanceof Fail);
+class Failure extends Validation {
+    constructor(value) {
+        super();
+        this.value = value;
+    }
+}
 
-module.exports = { success: (value) => new Success(value), fail: (value) => new Fail(value), isSuccess, isFail };
+// Applicative
+Validation.prototype.of = Validation.of = value => new Success(value);
+
+Success.prototype.of = Success.of = value => new Success(value);
+
+Failure.prototype.of = Failure.of = value => new Failure(value);
+
+Success.prototype.isSuccess = true;
+
+Success.prototype.isFailure = false;
+
+Failure.prototype.isFailure = true;
+
+Failure.prototype.isSuccess = false;
+
+// Apply
+Success.prototype.ap = function (x) {
+    return x.map(this.value);
+};
+
+Failure.prototype.ap = noop;
+
+// Functor
+Success.prototype.map = function (func) {
+    return new Success(func(this.value));
+};
+
+Failure.prototype.map = noop;
+
+// Chain
+Success.prototype.chain = function (func) {
+    return func(this.value);
+};
+
+Failure.prototype.chain = noop;
+
+module.exports = { Success, Failure, Validation };
