@@ -1,5 +1,5 @@
 const noop = function () {
-    return this;
+  return this;
 };
 
 // A sum type for error handling
@@ -7,17 +7,17 @@ class Validation {
 }
 
 class Success extends Validation {
-    constructor(value) {
-        super();
-        this.value = value;
-    }
+  constructor (value) {
+    super();
+    this.value = value;
+  }
 }
 
 class Failure extends Validation {
-    constructor(value) {
-        super();
-        this.value = value;
-    }
+  constructor (value) {
+    super();
+    this.value = value;
+  }
 }
 
 // Applicative
@@ -37,21 +37,21 @@ Failure.prototype.isSuccess = false;
 
 // Apply
 Success.prototype.ap = function (x) {
-    return x.map(this.value);
+  return x.map(this.value);
 };
 
 Failure.prototype.ap = noop;
 
 // Functor
 Success.prototype.map = function (func) {
-    return new Success(func(this.value));
+  return new Success(func(this.value));
 };
 
 Failure.prototype.map = noop;
 
 // Chain
 Success.prototype.chain = function (func) {
-    return func(this.value);
+  return func(this.value);
 };
 
 Failure.prototype.chain = noop;
